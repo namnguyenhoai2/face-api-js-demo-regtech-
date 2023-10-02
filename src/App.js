@@ -2,13 +2,27 @@ import { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
 import "./App.css";
 
+import Button from "@mui/material/Button";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+}));
+
 function App() {
   const idCardRef = useRef();
   const selfieRef = useRef();
   const isFirstRender = useRef(true);
 
-  const [imageOne, setImageOne] = useState();
-  const [imageTwo, setImageTwo] = useState();
+  const [imageOne, setImageOne] = useState("");
+  const [imageTwo, setImageTwo] = useState("");
   const [resultCompare, setResultCompare] = useState();
 
   const renderFace = async (image, x, y, width, height) => {
@@ -32,22 +46,37 @@ function App() {
 
     (async () => {
       // loading the models
-      await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
-      await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-      await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-      await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-      await faceapi.nets.faceExpressionNet.loadFromUri('/models');
-
+      console.log("Loading the models");
+      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      await faceapi.nets.faceExpressionNet.loadFromUri("/models");
+      console.log("Loading Done!");
     })();
   }, []);
+
+  const blobToBase64 = (blob) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
 
   const handleChangeImageOne = (e) => {
     console.log(e.target.files);
     const data = new FileReader();
     data.addEventListener("load", () => {
-      setImageOne(data.result);
       console.log("imageOne");
-      console.log(imageOne);
+      console.log(data.result);
+      setImageOne(data.result);
+      console.log({ imageOne });
+    });
+
+    data.addEventListener("error", (event) => {
+      console.log("error");
+      console.log(event);
     });
 
     data.readAsDataURL(e.target.files[0]);
@@ -57,12 +86,18 @@ function App() {
     console.log(e.target.files);
     const data = new FileReader();
     data.addEventListener("load", () => {
+      console.log("imageTwo");
+      console.log(data.result);
       setImageTwo(data.result);
+      console.log({ imageTwo });
+    });
+
+    data.addEventListener("error", (event) => {
+      console.log("error");
+      console.log(event);
     });
 
     data.readAsDataURL(e.target.files[0]);
-    console.log(imageTwo);
-    console.log(imageTwo);
   };
 
   const checkImage = () => {
@@ -75,14 +110,13 @@ function App() {
       // await faceapi.nets.faceExpressionNet.loadFromUri('/models');
 
       // detect a single face from the ID card image
-      const idCardFacedetection = await faceapi.detectSingleFace(idCardRef.current,
-        new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks().withFaceDescriptor();
+      const idCardFacedetection = await faceapi.detectSingleFace(idCardRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
 
       // detect a single face from the selfie image
-      const selfieFacedetection = await faceapi.detectSingleFace(selfieRef.current,
-        new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks().withFaceDescriptor();
+      const selfieFacedetection = await faceapi.detectSingleFace(selfieRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+
+      // console.log(idCardFacedetection);
+      // console.log(selfieFacedetection);
 
       //(OPTIONAL)
       /**
@@ -106,36 +140,59 @@ function App() {
       /**
        * Do face comparison only when faces were detected
        */
-      if(idCardFacedetection && selfieFacedetection){
+      if (idCardFacedetection && selfieFacedetection) {
         // Using Euclidean distance to comapare face descriptions
         const distance = faceapi.euclideanDistance(idCardFacedetection.descriptor, selfieFacedetection.descriptor);
         console.log(distance);
         setResultCompare(distance);
       }
-
     })();
   };
 
   return (
     <>
-      <div>
-        <input type="file" onChange={handleChangeImageOne} />
+
+
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Item>
+          <input type="file" onChange={handleChangeImageOne} />
+            <br></br>
+            <img ref={idCardRef} src={imageOne} height="200px" />
+          </Item>
+        </Grid>
+        <Grid item xs={6}>
+          <Item>
+          <input type="file" onChange={handleChangeImageTwo} />
+            <br></br>
+            <img ref={selfieRef} src={imageTwo} height="200px" />
+          </Item>
+        </Grid>
+        <Grid item xs={4}>
+          {/* <Item>xs=4</Item> */}
+        </Grid>
+        <Grid item xs={4}>
+          <Item>
+
+          <div>
+        <Button onClick={checkImage} variant="contained">
+          Check
+        </Button>
+
         <br></br>
-        <img ref={idCardRef}  src={imageOne} height="200px" />
+
+        <h3 style={{ color: "red" }}>{resultCompare}</h3>
+        <h2>{resultCompare}OK</h2>
       </div>
 
-      <div>
-        <input type="file" onChange={handleChangeImageTwo} />
-        <br></br>
-        <img ref={selfieRef} src={imageTwo} height="200px" />
-      </div>
+          </Item>
+        </Grid>
+        <Grid item xs={4}>
+          {/* <Item>xs=8</Item> */}
+        </Grid>
+      </Grid>
 
-      <div>
-        <button onClick={checkImage}>Check</button>
-        <br></br>
-        
-        <h3 style={{color: "red"}}>{resultCompare}</h3>
-      </div>
+
     </>
   );
 }

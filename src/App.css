@@ -9,3 +9,14 @@ div.gallery img {
   width: 100%;
   height: auto;
 }
+
+h2 {
+  color: blue;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+    height:100vh;
+}
