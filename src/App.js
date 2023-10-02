@@ -8,6 +8,9 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import LinearProgress from "@mui/material/LinearProgress";
+import Alert from "@mui/material/Alert";
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -24,6 +27,10 @@ function App() {
   const [imageOne, setImageOne] = useState("");
   const [imageTwo, setImageTwo] = useState("");
   const [resultCompare, setResultCompare] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isWarning, setIsWarning] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const renderFace = async (image, x, y, width, height) => {
     const canvas = document.createElement("canvas");
@@ -101,6 +108,11 @@ function App() {
   };
 
   const checkImage = () => {
+    setIsLoading(true);
+    setIsError(false);
+    setIsWarning(false);
+    setIsSuccess(false);
+
     (async () => {
       // loading the models
       // await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
@@ -145,6 +157,18 @@ function App() {
         const distance = faceapi.euclideanDistance(idCardFacedetection.descriptor, selfieFacedetection.descriptor);
         console.log(distance);
         setResultCompare(distance);
+        setIsLoading(false);
+
+        if(distance <= 0.45){
+          setIsSuccess(true);
+        }
+        else {
+          setIsWarning(true);
+        }
+
+      }
+      else {
+        setIsError(true);
       }
     })();
   };
@@ -193,6 +217,7 @@ function App() {
           {/* <Item>xs=4</Item> */}
         </Grid>
         <Grid item xs={4}>
+          {isLoading && <LinearProgress />}
           <Item>
             <div>
               <Button onClick={checkImage} variant="contained">
@@ -201,8 +226,13 @@ function App() {
 
               <br></br>
 
-              <h3 style={{ color: "red" }}>{resultCompare}</h3>
-              <h2>{resultCompare}OK</h2>
+              {/* <h3 style={{ color: "red" }}>{resultCompare}</h3>
+              <h2>{resultCompare}OK</h2> */}
+
+              {isWarning &&<Alert severity="warning">Kết quả không trùng khớp — {resultCompare}</Alert> }
+              {isSuccess && <Alert severity="success">Kết quả trùng khớp - {resultCompare}</Alert>}
+              {isError && <Alert severity="error">Lỗi - {resultCompare}</Alert>}
+
             </div>
           </Item>
         </Grid>

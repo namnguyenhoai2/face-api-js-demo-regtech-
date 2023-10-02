@@ -18,19 +18,17 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-    height:100vh;
+  height: 100vh;
 }
 
-body{ 
-
+body {
   position: absolute;
-                height: 80%; 
-                width: 80%; 
-                top: 10%; 
-                left: 10%; 
+  /* height: 80%; */
+  width: 80%;
+  top: 10%;
+  left: 10%;
+}
 
- }
-
- img {
+img {
   padding: 10px;
- }
+}
