@@ -7,7 +7,7 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -149,23 +149,44 @@ function App() {
     })();
   };
 
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
+
   return (
     <>
-
-
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Item>
-          <input type="file" onChange={handleChangeImageOne} />
+            {/* <input type="file" onChange={handleChangeImageOne} /> */}
+
+            <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              Ảnh 1
+              <VisuallyHiddenInput type="file" onChange={handleChangeImageOne} />
+            </Button>
             <br></br>
-            <img ref={idCardRef} src={imageOne} height="200px" />
+            <img ref={idCardRef} src={imageOne} height="300px" />
           </Item>
         </Grid>
         <Grid item xs={6}>
           <Item>
-          <input type="file" onChange={handleChangeImageTwo} />
+            {/* <input type="file" onChange={handleChangeImageTwo} /> */}
+
+            <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              Ảnh 2
+              <VisuallyHiddenInput type="file" onChange={handleChangeImageTwo} />
+            </Button>
+
             <br></br>
-            <img ref={selfieRef} src={imageTwo} height="200px" />
+            <img ref={selfieRef} src={imageTwo} height="300px" />
           </Item>
         </Grid>
         <Grid item xs={4}>
@@ -173,26 +194,22 @@ function App() {
         </Grid>
         <Grid item xs={4}>
           <Item>
+            <div>
+              <Button onClick={checkImage} variant="contained">
+                Check
+              </Button>
 
-          <div>
-        <Button onClick={checkImage} variant="contained">
-          Check
-        </Button>
+              <br></br>
 
-        <br></br>
-
-        <h3 style={{ color: "red" }}>{resultCompare}</h3>
-        <h2>{resultCompare}OK</h2>
-      </div>
-
+              <h3 style={{ color: "red" }}>{resultCompare}</h3>
+              <h2>{resultCompare}OK</h2>
+            </div>
           </Item>
         </Grid>
         <Grid item xs={4}>
           {/* <Item>xs=8</Item> */}
         </Grid>
       </Grid>
-
-
     </>
   );
 }

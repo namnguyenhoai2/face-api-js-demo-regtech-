@@ -20,3 +20,17 @@ h2 {
   align-items: center;
     height:100vh;
 }
+
+body{ 
+
+  position: absolute;
+                height: 80%; 
+                width: 80%; 
+                top: 10%; 
+                left: 10%; 
+
+ }
+
+ img {
+  padding: 10px;
+ }
