@@ -1,11 +1,15 @@
-import { useEffect, useRef } from 'react';
-import * as faceapi from 'face-api.js';
-import './App.css';
+import { useEffect, useRef, useState } from "react";
+import * as faceapi from "face-api.js";
+import "./App.css";
 
 function App() {
   const idCardRef = useRef();
   const selfieRef = useRef();
   const isFirstRender = useRef(true);
+
+  const [imageOne, setImageOne] = useState();
+  const [imageTwo, setImageTwo] = useState();
+  const [resultCompare, setResultCompare] = useState();
 
   const renderFace = async (image, x, y, width, height) => {
     const canvas = document.createElement("canvas");
@@ -21,10 +25,10 @@ function App() {
 
   useEffect(() => {
     // Prevent the function from executing on the first render
-    if (isFirstRender.current) {
-      isFirstRender.current = false; // toggle flag after first render/mounting
-      return;
-    }
+    // if (isFirstRender.current) {
+    //   isFirstRender.current = false; // toggle flag after first render/mounting
+    //   return;
+    // }
 
     (async () => {
       // loading the models
@@ -33,6 +37,42 @@ function App() {
       await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
       await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
       await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+
+    })();
+  }, []);
+
+  const handleChangeImageOne = (e) => {
+    console.log(e.target.files);
+    const data = new FileReader();
+    data.addEventListener("load", () => {
+      setImageOne(data.result);
+      console.log("imageOne");
+      console.log(imageOne);
+    });
+
+    data.readAsDataURL(e.target.files[0]);
+  };
+
+  const handleChangeImageTwo = (e) => {
+    console.log(e.target.files);
+    const data = new FileReader();
+    data.addEventListener("load", () => {
+      setImageTwo(data.result);
+    });
+
+    data.readAsDataURL(e.target.files[0]);
+    console.log(imageTwo);
+    console.log(imageTwo);
+  };
+
+  const checkImage = () => {
+    (async () => {
+      // loading the models
+      // await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+      // await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+      // await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+      // await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+      // await faceapi.nets.faceExpressionNet.loadFromUri('/models');
 
       // detect a single face from the ID card image
       const idCardFacedetection = await faceapi.detectSingleFace(idCardRef.current,
@@ -70,19 +110,31 @@ function App() {
         // Using Euclidean distance to comapare face descriptions
         const distance = faceapi.euclideanDistance(idCardFacedetection.descriptor, selfieFacedetection.descriptor);
         console.log(distance);
+        setResultCompare(distance);
       }
 
     })();
-  }, []);
+  };
 
   return (
     <>
-      <div className="gallery">
-        <img ref={idCardRef} src={require('./images/id-card.png')} alt="ID card" height="auto" />
+      <div>
+        <input type="file" onChange={handleChangeImageOne} />
+        <br></br>
+        <img ref={idCardRef}  src={imageOne} height="200px" />
       </div>
 
-      <div className="gallery">
-        <img ref={selfieRef} src={require('./images/selfie.webp')} alt="Selfie" height="auto" />
+      <div>
+        <input type="file" onChange={handleChangeImageTwo} />
+        <br></br>
+        <img ref={selfieRef} src={imageTwo} height="200px" />
+      </div>
+
+      <div>
+        <button onClick={checkImage}>Check</button>
+        <br></br>
+        
+        <h3 style={{color: "red"}}>{resultCompare}</h3>
       </div>
     </>
   );
