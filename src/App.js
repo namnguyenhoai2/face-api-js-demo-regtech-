@@ -22,7 +22,7 @@ const Item = styled(Paper)(({ theme }) => ({
 function App() {
   const idCardRef = useRef();
   const selfieRef = useRef();
-  const isFirstRender = useRef(true);
+  // const isFirstRender = useRef(true);
 
   const [imageOne, setImageOne] = useState("");
   const [imageTwo, setImageTwo] = useState("");
@@ -63,14 +63,6 @@ function App() {
     })();
   }, []);
 
-  const blobToBase64 = (blob) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-
   const handleChangeImageOne = (e) => {
     console.log(e.target.files);
     const data = new FileReader();
@@ -108,6 +100,7 @@ function App() {
   };
 
   const checkImage = () => {
+    setResultCompare(0);
     setIsLoading(true);
     setIsError(false);
     setIsWarning(false);
@@ -122,10 +115,10 @@ function App() {
       // await faceapi.nets.faceExpressionNet.loadFromUri('/models');
 
       // detect a single face from the ID card image
-      const idCardFacedetection = await faceapi.detectSingleFace(idCardRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+      const idCardFacedetection = await faceapi.detectSingleFace(idCardRef.current, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks().withFaceDescriptor();
 
       // detect a single face from the selfie image
-      const selfieFacedetection = await faceapi.detectSingleFace(selfieRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+      const selfieFacedetection = await faceapi.detectSingleFace(selfieRef.current, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks().withFaceDescriptor();
 
       // console.log(idCardFacedetection);
       // console.log(selfieFacedetection);
@@ -231,7 +224,7 @@ function App() {
 
               {isWarning &&<Alert severity="warning">Kết quả không trùng khớp — {resultCompare}</Alert> }
               {isSuccess && <Alert severity="success">Kết quả trùng khớp - {resultCompare}</Alert>}
-              {isError && <Alert severity="error">Lỗi - {resultCompare}</Alert>}
+              {isError && <Alert severity="error">Lỗi</Alert>}
 
             </div>
           </Item>
