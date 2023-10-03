@@ -12,6 +12,12 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Alert from "@mui/material/Alert";
 import Slider from "@mui/material/Slider";
 
+// icon
+import ThermostatIcon from "@mui/icons-material/Thermostat";
+import ContrastIcon from '@mui/icons-material/Contrast';
+import Brightness5Icon from '@mui/icons-material/Brightness5';
+import Stack from '@mui/material/Stack';
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -35,6 +41,93 @@ function App() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  const [tempValue1, setTempValue1] = useState(5000);
+  const [tempValue2, setTempValue2] = useState(5000);
+
+  const [contrastValue1, setContrastValue1] = useState(0);
+  const [contrastValue2, setContrastValue2] = useState(0);
+
+  const [brightValue1, setBrightValue1] = useState(0);
+  const [brightValue2, setBrightValue2] = useState(0);
+
+
+  const handleChangeTempValue1 = (event, newValue) => {
+    setTempValue1(newValue);
+
+    window.Caman("#image1", function () {
+      this.revert(true); // update the canvas' context
+      // this.whiteBalanceRgb(newValue); // in case of RGB input
+      this.whiteBalance(newValue); // in case of color temperature input
+
+      this.render(function () {
+        setImageOne(this.toBase64());
+      });
+    });
+  };
+
+  const handleChangeTempValue2 = (event, newValue) => {
+    setTempValue2(newValue);
+
+    window.Caman("#image2", function () {
+      this.revert(true); // update the canvas' context
+      // this.whiteBalanceRgb(newValue); // in case of RGB input
+      this.whiteBalance(newValue); // in case of color temperature input
+
+      this.render(function () {
+        setImageTwo(this.toBase64());
+      });
+    });
+  };
+
+  const handleChangeContrastValue1 = (event, newValue) => {
+    setContrastValue1(newValue);
+
+    window.Caman("#image1", function () {
+      this.revert(true); // update the canvas' context
+      this.contrast(newValue); // in case of color temperature input
+      this.render(function () {
+        setImageOne(this.toBase64());
+      });
+    });
+  };
+
+  const handleChangeContrastValue2 = (event, newValue) => {
+    setContrastValue2(newValue);
+
+    window.Caman("#image2", function () {
+      this.revert(true); // update the canvas' context
+      this.contrast(newValue); // in case of color temperature input
+      this.render(function () {
+        setImageTwo(this.toBase64());
+      });
+    });
+  };
+
+
+  const handleChangeBrightValue1 = (event, newValue) => {
+    setBrightValue1(newValue);
+
+    window.Caman("#image1", function () {
+      this.revert(true); // update the canvas' context
+      this.brightness(newValue); // in case of color temperature input
+      this.render(function () {
+        setImageOne(this.toBase64());
+      });
+    });
+  };
+
+  const handleChangeBrightValue2= (event, newValue) => {
+    setBrightValue2(newValue);
+
+    window.Caman("#image2", function () {
+      this.revert(true); // update the canvas' context
+      this.brightness(newValue); // in case of color temperature input
+      this.render(function () {
+        setImageTwo(this.toBase64());
+      });
+    });
+  };
 
   const rgbColor = { r: 119, g: 119, b: 119 };
   const colorTemperature = 9500; // e.g. some temperature between 0 and 40,000 K
@@ -110,7 +203,6 @@ function App() {
       window.Caman("#image2", data.result, function () {
         this.render();
       });
-
     });
 
     data.addEventListener("error", (event) => {
@@ -272,10 +364,28 @@ function App() {
             <img ref={idCardRef} src={imageOne} />
 
             <br></br>
-            {imageOne && (
+            {/* {imageOne && (
               <Button onClick={WhiteBalance} variant="contained">
                 White Balance
               </Button>
+            )} */}
+
+            {imageOne && (
+              <Box sx={{ width: 300 }}>
+                <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                  <ThermostatIcon />
+                  <Slider aria-label="Temperature" value={tempValue1} onChange={handleChangeTempValue1} valueLabelDisplay="auto" step={100} marks min={1700} max={27000} />
+                </Stack>
+                <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                  <ContrastIcon />
+                  <Slider aria-label="Contrast" value={contrastValue1} onChange={handleChangeContrastValue1} valueLabelDisplay="auto" step={1} marks min={-100} max={100} />
+                </Stack>
+                <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                  <Brightness5Icon />
+                  <Slider aria-label="Bright" value={brightValue1} onChange={handleChangeBrightValue1} valueLabelDisplay="auto" step={1} marks min={-100} max={100} />
+                </Stack>
+                
+              </Box>
             )}
 
             <img className="hidden-image" id="image1" src={imageOneHidden} />
@@ -290,10 +400,30 @@ function App() {
             <br></br>
             <img ref={selfieRef} src={imageTwo} />
             <br></br>
-            {imageTwo && (
+            {/* {imageTwo && (
               <Button onClick={WhiteBalance2} variant="contained">
                 White Balance
               </Button>
+            )} */}
+
+            {imageTwo && (
+
+              <Box sx={{ width: 300 }}>
+              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                <ThermostatIcon />
+                <Slider aria-label="Temperature" value={tempValue2} onChange={handleChangeTempValue2} valueLabelDisplay="auto" step={100} marks min={1700} max={27000} />
+              </Stack>
+              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                <ContrastIcon />
+                <Slider aria-label="Contrast" value={contrastValue2} onChange={handleChangeContrastValue2} valueLabelDisplay="auto" step={1} marks min={-100} max={100} />
+              </Stack>
+              <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                <Brightness5Icon />
+                <Slider aria-label="Bright" value={brightValue2} onChange={handleChangeBrightValue2} valueLabelDisplay="auto" step={1} marks min={-100} max={100} />
+              </Stack>
+              
+            </Box>
+
             )}
 
             <img className="hidden-image" id="image2" src={imageTwoHidden} />
