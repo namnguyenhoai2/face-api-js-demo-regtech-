@@ -10,6 +10,7 @@ import Grid from "@mui/material/Grid";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LinearProgress from "@mui/material/LinearProgress";
 import Alert from "@mui/material/Alert";
+import Slider from "@mui/material/Slider";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -25,12 +26,32 @@ function App() {
   // const isFirstRender = useRef(true);
 
   const [imageOne, setImageOne] = useState("");
+  const [imageOneHidden, setImageOneHidden] = useState("");
+  const [imageOneGrama, setImageOneGrama] = useState(0);
   const [imageTwo, setImageTwo] = useState("");
+  const [imageTwoHidden, setImageTwoHidden] = useState("");
   const [resultCompare, setResultCompare] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  const handleChangeImageOneGrama = (event, newValue) => {
+    setImageOneGrama(newValue);
+
+    window.Caman("#image1", function () {
+      this.brightness(newValue);
+      // this.contrast(30);
+      // // this.sepia(60);
+      // this.saturation(-30);
+
+      this.render(function () {
+        // console.log("this.toBase64()")
+        // console.log(this.toBase64())
+        setImageOne(this.toBase64());
+      });
+    });
+  };
 
   const renderFace = async (image, x, y, width, height) => {
     const canvas = document.createElement("canvas");
@@ -50,7 +71,6 @@ function App() {
     //   isFirstRender.current = false; // toggle flag after first render/mounting
     //   return;
     // }
-
     (async () => {
       // loading the models
       console.log("Loading the models");
@@ -71,6 +91,9 @@ function App() {
       console.log(data.result);
       setImageOne(data.result);
       console.log({ imageOne });
+
+      // TODO:
+      setImageOneHidden(data.result);
     });
 
     data.addEventListener("error", (event) => {
@@ -89,6 +112,8 @@ function App() {
       console.log(data.result);
       setImageTwo(data.result);
       console.log({ imageTwo });
+      // TODO:
+      setImageTwoHidden(data.result);
     });
 
     data.addEventListener("error", (event) => {
@@ -97,6 +122,60 @@ function App() {
     });
 
     data.readAsDataURL(e.target.files[0]);
+  };
+
+  const WhiteBalance = () => {
+    window.Caman("#image1", function () {
+      this.brightness(5);
+      // this.contrast(30);
+      // this.sepia(60);
+      // this.saturation(-30);
+
+      this.render(function () {
+        // console.log("this.toBase64()")
+        // console.log(this.toBase64())
+        setImageOne(this.toBase64());
+      });
+    });
+    // console.log(window.IJS);
+
+    // let image = window.IJS.Image.load(document.getElementById("image").src);
+
+    // (async () => {
+    //   let image = await window.IJS.Image.load(document.getElementById("image").src);
+
+    //   console.log(image.getHistogram({channel : 0}));
+    //   let grey = image.grey().setBorder({size: 10});
+
+    //   document.getElementById("image").src = grey.toDataURL();
+    // })();
+  };
+
+  const WhiteBalance2 = () => {
+    window.Caman("#image2", function () {
+      this.brightness(5);
+      // this.contrast(30);
+      // this.sepia(60);
+      // this.saturation(-30);
+
+      this.render(function () {
+        // console.log("this.toBase64()")
+        // console.log(this.toBase64())
+        setImageTwo(this.toBase64());
+      });
+    });
+    // console.log(window.IJS);
+
+    // let image = window.IJS.Image.load(document.getElementById("image").src);
+
+    // (async () => {
+    //   let image = await window.IJS.Image.load(document.getElementById("image").src);
+
+    //   console.log(image.getHistogram({channel : 0}));
+    //   let grey = image.grey().setBorder({size: 10});
+
+    //   document.getElementById("image").src = grey.toDataURL();
+    // })();
   };
 
   const checkImage = () => {
@@ -152,15 +231,12 @@ function App() {
         setResultCompare(distance);
         setIsLoading(false);
 
-        if(distance <= 0.45){
+        if (distance <= 0.45) {
           setIsSuccess(true);
-        }
-        else {
+        } else {
           setIsWarning(true);
         }
-
-      }
-      else {
+      } else {
         setIsError(true);
       }
     })();
@@ -183,27 +259,36 @@ function App() {
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Item>
-            {/* <input type="file" onChange={handleChangeImageOne} /> */}
-
             <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
               Ảnh 1
               <VisuallyHiddenInput type="file" onChange={handleChangeImageOne} />
             </Button>
             <br></br>
-            <img ref={idCardRef} src={imageOne} height="300px" />
+            <img ref={idCardRef} src={imageOne} />
+
+            <br></br>
+            {imageOne && <Button onClick={WhiteBalance} variant="contained">
+              Fake White Balance
+            </Button>}
+            
+
+            <img className="hidden-image" id="image1" src={imageOneHidden} />
           </Item>
         </Grid>
         <Grid item xs={6}>
           <Item>
-            {/* <input type="file" onChange={handleChangeImageTwo} /> */}
-
             <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
               Ảnh 2
               <VisuallyHiddenInput type="file" onChange={handleChangeImageTwo} />
             </Button>
-
             <br></br>
-            <img ref={selfieRef} src={imageTwo} height="300px" />
+            <img ref={selfieRef} src={imageTwo} />
+            <br></br>
+            {imageTwo && <Button onClick={WhiteBalance2} variant="contained">
+              Fake White Balance
+            </Button>}
+
+            <img className="hidden-image" id="image2" src={imageTwoHidden} />
           </Item>
         </Grid>
         <Grid item xs={4}>
@@ -222,10 +307,9 @@ function App() {
               {/* <h3 style={{ color: "red" }}>{resultCompare}</h3>
               <h2>{resultCompare}OK</h2> */}
 
-              {isWarning &&<Alert severity="warning">Kết quả không trùng khớp — {resultCompare}</Alert> }
+              {isWarning && <Alert severity="warning">Kết quả không trùng khớp — {resultCompare}</Alert>}
               {isSuccess && <Alert severity="success">Kết quả trùng khớp - {resultCompare}</Alert>}
               {isError && <Alert severity="error">Lỗi</Alert>}
-
             </div>
           </Item>
         </Grid>

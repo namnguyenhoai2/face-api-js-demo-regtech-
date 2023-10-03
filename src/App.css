@@ -31,4 +31,10 @@ body {
 
 img {
   padding: 10px;
+  height: 300px;
+}
+
+
+.hidden-image {
+  display: none;
 }
