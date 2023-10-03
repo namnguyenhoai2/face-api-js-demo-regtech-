@@ -36,6 +36,9 @@ function App() {
   const [isWarning, setIsWarning] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const rgbColor = {r: 200, g: 200, b: 200};
+  const colorTemperature = 9500   ; // e.g. some temperature between 0 and 40,000 K
+
   const handleChangeImageOneGrama = (event, newValue) => {
     setImageOneGrama(newValue);
 
@@ -125,11 +128,18 @@ function App() {
   };
 
   const WhiteBalance = () => {
+
+   
+
     window.Caman("#image1", function () {
-      this.brightness(5);
+      // this.brightness(5);
       // this.contrast(30);
       // this.sepia(60);
       // this.saturation(-30);
+
+      this.revert(true); // update the canvas' context
+      // this.whiteBalanceRgb(rgbColor); // in case of RGB input
+      this.whiteBalance(colorTemperature); // in case of color temperature input
 
       this.render(function () {
         // console.log("this.toBase64()")
@@ -153,10 +163,15 @@ function App() {
 
   const WhiteBalance2 = () => {
     window.Caman("#image2", function () {
-      this.brightness(5);
+      // this.brightness(5);
       // this.contrast(30);
       // this.sepia(60);
       // this.saturation(-30);
+
+      this.revert(true); // update the canvas' context
+      // this.whiteBalanceRgb(rgbColor); // in case of RGB input
+      this.whiteBalance(colorTemperature); // in case of color temperature input
+
 
       this.render(function () {
         // console.log("this.toBase64()")
@@ -268,7 +283,7 @@ function App() {
 
             <br></br>
             {imageOne && <Button onClick={WhiteBalance} variant="contained">
-              Fake White Balance
+              White Balance
             </Button>}
             
 
@@ -285,7 +300,7 @@ function App() {
             <img ref={selfieRef} src={imageTwo} />
             <br></br>
             {imageTwo && <Button onClick={WhiteBalance2} variant="contained">
-              Fake White Balance
+              White Balance
             </Button>}
 
             <img className="hidden-image" id="image2" src={imageTwoHidden} />
