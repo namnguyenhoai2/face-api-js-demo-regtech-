@@ -27,7 +27,7 @@ function App() {
 
   const [imageOne, setImageOne] = useState("");
   const [imageOneHidden, setImageOneHidden] = useState("");
-  const [imageOneGrama, setImageOneGrama] = useState(0);
+
   const [imageTwo, setImageTwo] = useState("");
   const [imageTwoHidden, setImageTwoHidden] = useState("");
   const [resultCompare, setResultCompare] = useState();
@@ -36,25 +36,8 @@ function App() {
   const [isWarning, setIsWarning] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const rgbColor = {r: 200, g: 200, b: 200};
-  const colorTemperature = 9500   ; // e.g. some temperature between 0 and 40,000 K
-
-  const handleChangeImageOneGrama = (event, newValue) => {
-    setImageOneGrama(newValue);
-
-    window.Caman("#image1", function () {
-      this.brightness(newValue);
-      // this.contrast(30);
-      // // this.sepia(60);
-      // this.saturation(-30);
-
-      this.render(function () {
-        // console.log("this.toBase64()")
-        // console.log(this.toBase64())
-        setImageOne(this.toBase64());
-      });
-    });
-  };
+  const rgbColor = { r: 119, g: 119, b: 119 };
+  const colorTemperature = 9500; // e.g. some temperature between 0 and 40,000 K
 
   const renderFace = async (image, x, y, width, height) => {
     const canvas = document.createElement("canvas");
@@ -97,6 +80,11 @@ function App() {
 
       // TODO:
       setImageOneHidden(data.result);
+
+      document.querySelector("#image1").removeAttribute("data-caman-id");
+      window.Caman("#image1", data.result, function () {
+        this.render();
+      });
     });
 
     data.addEventListener("error", (event) => {
@@ -117,6 +105,12 @@ function App() {
       console.log({ imageTwo });
       // TODO:
       setImageTwoHidden(data.result);
+
+      document.querySelector("#image2").removeAttribute("data-caman-id");
+      window.Caman("#image2", data.result, function () {
+        this.render();
+      });
+
     });
 
     data.addEventListener("error", (event) => {
@@ -128,9 +122,6 @@ function App() {
   };
 
   const WhiteBalance = () => {
-
-   
-
     window.Caman("#image1", function () {
       // this.brightness(5);
       // this.contrast(30);
@@ -138,8 +129,8 @@ function App() {
       // this.saturation(-30);
 
       this.revert(true); // update the canvas' context
-      // this.whiteBalanceRgb(rgbColor); // in case of RGB input
-      this.whiteBalance(colorTemperature); // in case of color temperature input
+      this.whiteBalanceRgb(rgbColor); // in case of RGB input
+      // this.whiteBalance(colorTemperature); // in case of color temperature input
 
       this.render(function () {
         // console.log("this.toBase64()")
@@ -169,9 +160,8 @@ function App() {
       // this.saturation(-30);
 
       this.revert(true); // update the canvas' context
-      // this.whiteBalanceRgb(rgbColor); // in case of RGB input
-      this.whiteBalance(colorTemperature); // in case of color temperature input
-
+      this.whiteBalanceRgb(rgbColor); // in case of RGB input
+      // this.whiteBalance(colorTemperature); // in case of color temperature input
 
       this.render(function () {
         // console.log("this.toBase64()")
@@ -282,10 +272,11 @@ function App() {
             <img ref={idCardRef} src={imageOne} />
 
             <br></br>
-            {imageOne && <Button onClick={WhiteBalance} variant="contained">
-              White Balance
-            </Button>}
-            
+            {imageOne && (
+              <Button onClick={WhiteBalance} variant="contained">
+                White Balance
+              </Button>
+            )}
 
             <img className="hidden-image" id="image1" src={imageOneHidden} />
           </Item>
@@ -299,9 +290,11 @@ function App() {
             <br></br>
             <img ref={selfieRef} src={imageTwo} />
             <br></br>
-            {imageTwo && <Button onClick={WhiteBalance2} variant="contained">
-              White Balance
-            </Button>}
+            {imageTwo && (
+              <Button onClick={WhiteBalance2} variant="contained">
+                White Balance
+              </Button>
+            )}
 
             <img className="hidden-image" id="image2" src={imageTwoHidden} />
           </Item>
